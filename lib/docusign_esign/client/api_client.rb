@@ -571,7 +571,28 @@ module DocuSign_eSign
       }
       data, status_code, headers = self.call_api("POST", '/oauth/token', params)
       abort(data.inspect)
+    end
 
+    def refresh_token(client_id, client_secret, refresh_token)
+      raise ArgumentError.new('client_id cannot be empty') if client_id.empty?
+      raise ArgumentError.new('client_secret cannot be empty') if client_secret.empty?
+      raise ArgumentError.new('refresh_token cannot be empty') if refresh_token.empty?
+
+      authcode = "Basic " + Base64.strict_encode64("#{client_id}:#{client_secret}")
+      params = {
+          :header_params => {
+              "Authorization" => authcode,
+              "Content-Type" => "application/x-www-form-urlencoded"
+          },
+          :form_params => {
+            "grant_type" => 'refresh_token',
+            "refresh_token" => refresh_token,
+          },
+          :return_type => 'OAuth::OAuthToken',
+          :oauth => true
+      }
+      data, status_code, headers = self.call_api("POST", '/oauth/token', params)
+      abort(data.inspect)
     end
 
     def set_access_token(token_obj)

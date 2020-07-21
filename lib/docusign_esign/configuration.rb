@@ -122,6 +122,12 @@ module DocuSign_eSign
 
     attr_accessor :force_ending_format
 
+    attr_accessor :client_id
+
+    attr_accessor :integration_key
+
+    attr_accessor :secret_key
+
     def initialize
       @scheme = 'https'
       @host = 'www.docusign.net'
