@@ -570,7 +570,7 @@ module DocuSign_eSign
           :oauth => true
       }
       data, status_code, headers = self.call_api("POST", '/oauth/token', params)
-      abort(data.inspect)
+      data
     end
 
     def refresh_token(client_id, client_secret, refresh_token)
@@ -592,7 +592,7 @@ module DocuSign_eSign
           :oauth => true
       }
       data, status_code, headers = self.call_api("POST", '/oauth/token', params)
-      abort(data.inspect)
+      data
     end
 
     def set_access_token(token_obj)
