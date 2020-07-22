@@ -39,6 +39,7 @@ module DocuSign_eSign
         'Content-Type' => "application/json",
         'User-Agent' => @user_agent
       }
+      self.set_oauth_base_path if !self.oauth_base_path
     end
 
     def self.default
@@ -259,7 +260,7 @@ module DocuSign_eSign
     def build_request_url(path, opts)
       # Add leading and trailing slashes to path
       path = "/#{path}".gsub(/\/+/, '/')
-      return URI.encode("https://" + self.get_oauth_base_path + path) if opts[:oauth]
+      return URI.encode("https://" + self.oauth_base_path + path) if opts[:oauth]
       URI.encode(@config.base_url + path)
     end
 
@@ -382,12 +383,6 @@ module DocuSign_eSign
       end
     end
 
-    # Helper method to set base_path
-    # @param [String] base_path
-    def set_base_path(base_path)
-      self.base_path = base_path
-    end
-
     # Helper method to set oauth base path
     # @param [String] oauth_base_path if passed nil it will determined from base_path
     def set_oauth_base_path(oauth_base_path=nil)
@@ -405,34 +400,6 @@ module DocuSign_eSign
       else
         self.oauth_base_path = OAuth::PRODUCTION_OAUTH_BASE_PATH
       end
-    end
-
-    # Helper method to get oauth base path
-    def get_oauth_base_path
-      if !self.oauth_base_path
-        self.set_oauth_base_path()
-      end
-      self.oauth_base_path
-    end
-
-    # Helper method to configure the OAuth accessCode/implicit flow parameters
-    # @param [String] client_id DocuSign OAuth Client Id(AKA Integrator Key)
-    # @param scopes The list of requested scopes.  Client applications may be scoped to a limited set of system access.
-    # @param [String] redirect_uri This determines where to deliver the response containing the authorization code
-    # @param [String] response_type Determines the response type of the authorization request, NOTE: these response types are mutually exclusive for a client application. A public/native client application may only request a response type
-    #          of "token". A private/trusted client application may only request a response type of "code".
-    # @param [String] state Allows for arbitrary state that may be useful to your application. The value in this parameter
-    #             will be round-tripped along with the response so you can make sure it didn't change.
-    # @return [String]
-    def get_authorization_uri(client_id, scopes, redirect_uri, response_type, state=nil)
-      self.oauth_base_path ||= self.get_oauth_base_path
-
-      scopes = scopes.join(' ') if scopes.kind_of?(Array)
-      scopes = OAuth::SCOPE_SIGNATURE if scopes.empty?
-
-      uri = "https://%{base_path}/oauth/auth?response_type=%{response_type}&scope=%{scopes}&client_id=%{client_id}&redirect_uri=%{redirect_uri}"
-      uri += "&state=%{state}" if state
-      uri  % {base_path: self.oauth_base_path, response_type:response_type, scopes: scopes, client_id: client_id, redirect_uri: redirect_uri, state: state}
     end
 
     # Request JWT User Token
@@ -454,7 +421,7 @@ module DocuSign_eSign
       claim = {
         "iss" => client_id,
         "sub" => user_id,
-        "aud" => self.get_oauth_base_path,
+        "aud" => self.oauth_base_path,
         "iat" => now,
         "exp" => now + expires_in,
         "scope"=> scopes
@@ -501,7 +468,7 @@ module DocuSign_eSign
       now = Time.now.to_i
       claim = {
           "iss" => client_id,
-          "aud" => self.get_oauth_base_path,
+          "aud" => self.oauth_base_path,
           "iat" => now,
           "exp" => now + expires_in,
           "scope"=> scopes
@@ -595,15 +562,11 @@ module DocuSign_eSign
       data
     end
 
-    def set_access_token(token_obj)
-      self.default_headers['Authorization'] = token_obj.access_token
-    end
-
     # Helper method to add default header params
     # @param [String] header_name
     # @param [String] header_value
     def set_default_header(header_name, header_value)
-        @default_headers[header_name] = header_value
+      @default_headers[header_name] = header_value
     end
   end
 end

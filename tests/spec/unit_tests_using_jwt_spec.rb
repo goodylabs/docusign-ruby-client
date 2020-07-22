@@ -11,7 +11,6 @@ describe 'DocuSign Ruby Client Tests' do
 
 				$api_client = DocuSign_eSign::ApiClient.new(configuration)
         			$api_client.set_oauth_base_path(DocuSign_eSign::OAuth::DEMO_OAUTH_BASE_PATH)
-				# $api_client.get_authorization_uri($integrator_key,'signature',$return_url,'code')
 				# $api_client.request_jwt_application_token($integrator_key,File.read($private_key_filename),$expires_in_seconds,'' )
 				# code = 'code_here'
 				# $api_client.generate_access_token($integrator_key,$secret,code)
@@ -35,7 +34,7 @@ describe 'DocuSign Ruby Client Tests' do
 
             # IMPORTANT: Use the base url from the login account to instantiant the api_client
 						base_uri = URI.parse($base_uri)
-						$api_client.set_base_path( "%s://%s/restapi" % [base_uri.scheme, base_uri.host])
+						$api_client.base_path = "%s://%s/restapi" % [base_uri.scheme, base_uri.host]
 
 						return account
 					end
@@ -113,7 +112,7 @@ describe 'DocuSign Ruby Client Tests' do
 
   before(:all) do
     # run before each test
-    $host = "https://demo.docusign.net/restapi"
+    $host = "https://docusign.net/restapi"
 
   	$expires_in_seconds = 3600 #1 hour
   	$auth_server = 'account-d.docusign.com'
