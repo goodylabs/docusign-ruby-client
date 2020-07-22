@@ -398,9 +398,9 @@ module DocuSign_eSign
       #raise ArgumentError.new('oAuthBasePath cannot be empty')  unless oauth_base_path
 
       # Derive OAuth Base Path if not given
-      if self.base_path.start_with?("https://demo") or self.base_path.start_with?("http://demo")
+      if self.config.base_url.start_with?("https://demo") or self.config.base_url.start_with?("http://demo")
         self.oauth_base_path = OAuth::DEMO_OAUTH_BASE_PATH
-      elsif self.base_path.start_with?("https://stage") or self.base_path.start_with?("http://stage")
+      elsif self.config.base_url.start_with?("https://stage") or self.config.base_url.start_with?("http://stage")
         self.oauth_base_path = OAuth::STAGE_OAUTH_BASE_PATH
       else
         self.oauth_base_path = OAuth::PRODUCTION_OAUTH_BASE_PATH
