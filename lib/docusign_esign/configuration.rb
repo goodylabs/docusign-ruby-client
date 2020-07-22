@@ -23,6 +23,8 @@ module DocuSign_eSign
     # Defines url base path
     attr_accessor :base_path
 
+    attr_accessor :account_id
+
     # Defines API keys used with API Key authentications.
     #
     # @return [Hash] key: parameter name, value: parameter value (API key)
